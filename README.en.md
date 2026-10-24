@@ -1,0 +1,116 @@
+# ModeCalc
+
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![tests](https://github.com/lewihuang/ModeCalc/actions/workflows/tests.yml/badge.svg)](https://github.com/lewihuang/ModeCalc/actions/workflows/tests.yml)
+[![Python 3.12](https://img.shields.io/badge/python-3.12-blue.svg)](https://www.python.org/)
+[![Platform: Windows](https://img.shields.io/badge/platform-Windows-lightgrey.svg)](#requirements)
+
+[简体中文](README.md) | English
+
+ModeCalc is a Windows desktop tool for real-time MIDI chord and mode detection. Connect a MIDI keyboard and it shows the current chord, matching modes, standard notation, an 88-key piano and a guitar fretboard — useful for practice, transcription and harmony analysis.
+
+![ModeCalc UI](docs/images/modecalc.png)
+
+- [Download](#download)
+- [Features](#features)
+- [Requirements](#requirements)
+- [Quick start](#quick-start)
+- [Build](#build)
+- [Test](#test)
+- [Project layout](#project-layout)
+- [License](#license)
+
+## Download
+
+Get the latest Windows build from [Releases](https://github.com/lewihuang/ModeCalc/releases):
+
+- `ModeCalc-v1.0.1-win64.zip` — portable, unzip and run `ModeCalc.exe`;
+- single-file exe, no Python installation required.
+
+> The exe is not code-signed, so Windows SmartScreen may warn about an unrecognized app. Choose "More info → Run anyway", or verify the SHA256 published in the release.
+
+## Features
+
+- **Two lenses**: switch between `Chord` and `Mode` analysis for the same notes.
+- **Chord detection**: ~60 templates covering triads, seventh, ninth/eleventh/thirteenth, add and altered chords, with inversions and incomplete-match hints.
+- **Mode detection**: ~25 parent scales across diatonic modes, modes of limited transposition, pentatonic/blues, bebop and world scales; shows tonic, rotation and missing-note count.
+- **Messiaen modes of limited transposition**: named by their minimal repeating interval cell (e.g. `Messiaen 211`, `Messiaen 1131`).
+- **Pinned mode**: click any match to pin it; notes outside the pinned scale are highlighted in red `#FF5768` on the keyboard.
+- **Derived modes**: while a mode is pinned, pressing multiple notes including out-of-scale notes lists modes anchored on the pinned tonic that contain all pressed notes; click one to re-pin.
+- **Visualisation**: standard notation (VexFlow), 88-key piano (SVG), guitar fretboard.
+- **Key signatures**: 15 keys, affecting enharmonic spelling and staff notation.
+- **MIDI**: device selection (including "All inputs") and sustain pedal support.
+- **Remembered selections**: parent-scale checkboxes are persisted locally and restored on startup.
+
+## Requirements
+
+- **Windows 10 / 11** with the WebView2 Runtime (included in Windows 11)
+- **Python 3.12** (only for running from source / building)
+- A MIDI input device (optional; the UI still opens without one)
+
+## Quick start
+
+```powershell
+git clone https://github.com/lewihuang/ModeCalc.git
+cd ModeCalc
+
+python -m venv .venv
+.venv\Scripts\activate
+
+pip install -r requirements.txt
+python app.py
+```
+
+Choose your device from the `MIDI Input` menu, then switch between `Chord` and `Mode` on the right.
+
+## Build
+
+```powershell
+pip install -r requirements.txt
+build.bat
+```
+
+The output is `dist\ModeCalc.exe` (single file, `static` assets bundled). The build uses PyInstaller; version metadata lives in `version_info.txt`.
+
+## Test
+
+```powershell
+pytest -q
+```
+
+CI runs the full suite on a Windows runner for every push and pull request (see `.github/workflows/tests.yml`).
+
+## Project layout
+
+```
+app.py               pywebview desktop entry (MIDI polling + frontend bridge)
+server.py            aiohttp + WebSocket browser debugging entry
+chord_engine.py      chord recognition (templates / inversions / incomplete matches)
+mode_engine.py       scale registry and mode detection (parents, rotations, sub_scales)
+midi_handler.py      MIDI input (callback + queue, sustain pedal logic)
+settings_store.py    user settings persistence
+static/              frontend: HTML / CSS / JS, VexFlow, fonts, fretboard library
+tests/               pytest unit tests
+docs/                design docs, ADRs and changelog
+.github/             CI, issue and PR templates
+version_info.txt     Windows executable version metadata
+build.bat            PyInstaller build script
+```
+
+## Usage tips
+
+- **Pinning a mode**: click any result in `Matches` to pin/unpin it; the keyboard highlights the scale.
+- **Red notes**: when a mode is pinned, pressed notes outside the scale turn red; this is only a hint and does not affect chord recognition.
+- **Derived modes**: red notes trigger candidate modes prefixed with `↳` and a red left border; click one to switch the pinned mode.
+- **Local settings**: saved in `%APPDATA%\ModeCalc\settings.json`; delete the file to reset.
+- **Browser debugging**: run `python server.py` and open `http://localhost:8765`.
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) (in Chinese) for the development and testing conventions.
+
+## License
+
+Licensed under the [MIT License](LICENSE).
+
+Third-party components (VexFlow, traste, Bravura / Academico, Quicksand, etc.) are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md); the full OFL text is in [LICENSES/OFL-1.1.txt](LICENSES/OFL-1.1.txt).

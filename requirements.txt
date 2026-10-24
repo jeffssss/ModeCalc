@@ -1,0 +1,6 @@
+mido
+python-rtmidi
+pywebview
+pyinstaller
+aiohttp
+pytest

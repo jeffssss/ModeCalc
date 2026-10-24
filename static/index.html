@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ModeCalc</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="branding">
+    <div>ModeCalc v1.0.1</div>
+  </div>
+  <nav id="menu-bar">
+    <div class="menu-item">
+      <button class="menu-trigger" data-menu="key-menu">Key</button>
+      <div class="menu-dropdown" id="key-menu">
+        <div class="menu-option" data-value="C">C</div>
+        <div class="menu-option" data-value="G">G (1♯)</div>
+        <div class="menu-option" data-value="D">D (2♯)</div>
+        <div class="menu-option" data-value="A">A (3♯)</div>
+        <div class="menu-option" data-value="E">E (4♯)</div>
+        <div class="menu-option" data-value="B">B (5♯)</div>
+        <div class="menu-option" data-value="F#">F♯ (6♯)</div>
+        <div class="menu-option" data-value="C#">C♯ (7♯)</div>
+        <div class="menu-option" data-value="F">F (1♭)</div>
+        <div class="menu-option" data-value="Bb">B♭ (2♭)</div>
+        <div class="menu-option" data-value="Eb">E♭ (3♭)</div>
+        <div class="menu-option" data-value="Ab">A♭ (4♭)</div>
+        <div class="menu-option" data-value="Db">D♭ (5♭)</div>
+        <div class="menu-option" data-value="Gb">G♭ (6♭)</div>
+        <div class="menu-option" data-value="Cb">C♭ (7♭)</div>
+      </div>
+    </div>
+    <div class="menu-item">
+      <button class="menu-trigger" data-menu="midi-menu">MIDI Input</button>
+      <div class="menu-dropdown" id="midi-menu">
+        <div class="menu-placeholder">(empty)</div>
+      </div>
+    </div>
+    <div class="menu-item">
+      <button class="menu-trigger" data-menu="help-menu">Help</button>
+      <div class="menu-dropdown" id="help-menu">
+        <div class="menu-option" data-action="usage-guide">Usage Guide</div>
+      </div>
+    </div>
+  </nav>
+  <div id="chord-name"></div>
+  <div id="middle-row">
+    <div id="staff"></div>
+    <div id="matches-panel">
+      <div class="panel-title">Matches</div>
+      <ul id="matches-list"></ul>
+    </div>
+    <div id="control-panel">
+      <select id="key-select" class="hidden">
+        <option value="C" selected>C</option>
+        <option value="G">G (1♯)</option>
+        <option value="D">D (2♯)</option>
+        <option value="A">A (3♯)</option>
+        <option value="E">E (4♯)</option>
+        <option value="B">B (5♯)</option>
+        <option value="F#">F♯ (6♯)</option>
+        <option value="C#">C♯ (7♯)</option>
+        <option value="F">F (1♭)</option>
+        <option value="Bb">B♭ (2♭)</option>
+        <option value="Eb">E♭ (3♭)</option>
+        <option value="Ab">A♭ (4♭)</option>
+        <option value="Db">D♭ (5♭)</option>
+        <option value="Gb">G♭ (6♭)</option>
+        <option value="Cb">C♭ (7♭)</option>
+      </select>
+      <div id="analysis-toggle">
+        <label><input type="radio" name="analysis" value="chord" checked> Chord</label>
+        <label><input type="radio" name="analysis" value="mode"> Mode</label>
+      </div>
+      <div id="mode-panel" class="hidden">
+        <div id="parent-checks">
+          <div class="scale-group">
+            <div class="group-header">
+              <input type="checkbox" class="group-check">
+              <span class="group-label">七声调式</span>
+              <span class="group-toggle">▼</span>
+            </div>
+            <div class="group-body collapsed">
+              <label><input type="checkbox" class="scale-check" value="Ionian" checked> Ionian</label>
+              <label><input type="checkbox" class="scale-check" value="Melodic Minor" checked> Melodic Minor</label>
+              <label><input type="checkbox" class="scale-check" value="Harmonic Minor" checked> Harmonic Minor</label>
+              <label><input type="checkbox" class="scale-check" value="Harmonic Major" checked> Harmonic Major</label>
+              <label><input type="checkbox" class="scale-check" value="Double Harmonic Major" checked> Double Harmonic Major</label>
+              <label><input type="checkbox" class="scale-check" value="Neapolitan Major" checked> Neapolitan Major</label>
+              <label><input type="checkbox" class="scale-check" value="Neapolitan Minor" checked> Neapolitan Minor</label>
+              <label><input type="checkbox" class="scale-check" value="Hungarian Minor" checked> Hungarian Minor</label>
+              <label><input type="checkbox" class="scale-check" value="Hungarian Major" checked> Hungarian Major</label>
+              <label><input type="checkbox" class="scale-check" value="Enigmatic" checked> Enigmatic</label>
+            </div>
+          </div>
+          <div class="scale-group">
+            <div class="group-header">
+              <input type="checkbox" class="group-check">
+              <span class="group-label">有限移位调式</span>
+              <span class="group-toggle">▼</span>
+            </div>
+            <div class="group-body collapsed">
+              <label><input type="checkbox" class="scale-check" value="Whole Tone"> Whole Tone</label>
+              <label><input type="checkbox" class="scale-check" value="Diminished WH"> Diminished Whole-Half</label>
+              <label><input type="checkbox" class="scale-check" value="Diminished HW"> Diminished Half-Whole</label>
+              <label><input type="checkbox" class="scale-check" value="Augmented"> Augmented</label>
+              <label><input type="checkbox" class="scale-check" value="Messiaen"> Messiaen</label>
+            </div>
+          </div>
+          <div class="scale-group">
+            <div class="group-header">
+              <input type="checkbox" class="group-check">
+              <span class="group-label">五声调式</span>
+              <span class="group-toggle">▼</span>
+            </div>
+            <div class="group-body collapsed">
+              <label><input type="checkbox" class="scale-check" value="Major Pentatonic"> Major Pentatonic</label>
+              <label><input type="checkbox" class="scale-check" value="Blues"> Blues</label>
+              <label><input type="checkbox" class="scale-check" value="Major Blues"> Major Blues</label>
+            </div>
+          </div>
+          <div class="scale-group">
+            <div class="group-header">
+              <input type="checkbox" class="group-check">
+              <span class="group-label">Bebop</span>
+              <span class="group-toggle">▼</span>
+            </div>
+            <div class="group-body collapsed">
+              <label><input type="checkbox" class="scale-check" value="Bebop Dominant"> Bebop Dominant</label>
+              <label><input type="checkbox" class="scale-check" value="Bebop Major"> Bebop Major</label>
+              <label><input type="checkbox" class="scale-check" value="Bebop Dorian"> Bebop Dorian</label>
+            </div>
+          </div>
+          <div class="scale-group">
+            <div class="group-header">
+              <input type="checkbox" class="group-check">
+              <span class="group-label">世界民族调式</span>
+              <span class="group-toggle">▼</span>
+            </div>
+            <div class="group-body collapsed">
+              <label><input type="checkbox" class="scale-check" value="Japanese"> Japanese</label>
+              <label><input type="checkbox" class="scale-check" value="Indian"> Indian</label>
+              <label><input type="checkbox" class="scale-check" value="Arabic"> Arabic</label>
+              <label><input type="checkbox" class="scale-check" value="Persian"> Persian</label>
+              <label><input type="checkbox" class="scale-check" value="Ethiopian"> Ethiopian</label>
+              <label><input type="checkbox" class="scale-check" value="Jewish"> Jewish</label>
+              <label><input type="checkbox" class="scale-check" value="Spanish"> Spanish</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="sustain-bar">
+    <div id="sustain-indicator">
+      <span class="sus-check"></span>
+      <span class="sus-label">Sustain</span>
+    </div>
+  </div>
+  <div id="fretboard"></div>
+  <div id="keyboard"></div>
+  <div id="debug-bar"><span id="db-midi">MIDI: ?</span> <span id="db-font">Font: ?</span> <span id="db-notes">Notes: -</span> <span id="db-sus"></span></div>
+  <div id="modal-overlay" class="hidden">
+    <div id="modal-box">
+      <div id="modal-header">
+        <span>ModeCalc 使用说明</span>
+        <span id="modal-close">✕</span>
+      </div>
+      <div id="modal-body">
+        <h3>MIDI 输入</h3>
+        <p>连接 MIDI 键盘或虚拟端口。ModeCalc 实时监听音符输入，即时分析和弦与调式。</p>
+
+        <h3>调性设置（Key 菜单）</h3>
+        <p>选择当前调性，控制五线谱升降号的显示方式，同时影响和弦拼写的升降偏好。</p>
+
+        <h3>和弦分析模式（Chord）</h3>
+        <p>实时和弦识别：基于约 60 个和弦模板，检测三和弦、七和弦、延伸音与转位。不完整匹配标记为"?"。点击 Matches 面板中的结果可将该调式的音阶高亮锁定在钢琴键盘上。</p>
+
+        <h3>调式分析模式（Mode）</h3>
+        <p>调式/音阶检测，覆盖约 25 个父音阶，分类包括：七声调式、有限移位调式、五声调式、布鲁斯、Bebop、世界民族调式。</p>
+        <p>母音阶勾选状态会自动保存，下次启动自动恢复。</p>
+
+        <h3>Matches 面板</h3>
+        <p>显示所有符合当前音符输入的调式。点击某个结果可在钢琴键盘上锁定该调式音阶并高亮，再次点击取消锁定。</p>
+        <p>锁定后，按下的音若在音阶外会用红色（#FF5768）标出；此时若同时按下多个音且含音阶外音，下方会列出以该调式调中心为锚、包含全部按下音的音阶，点击即可切换固定。</p>
+
+        <h3>延音踏板</h3>
+        <p>支持延音踏板 — 踩下后音符持续保持并显示，直至松开。</p>
+      </div>
+    </div>
+  </div>
+  <script src="vendor/vexflow-core.js"></script>
+  <script src="vendor/traste.min.js"></script>
+  <script src="keyboard.js"></script>
+  <script src="staff.js"></script>
+  <script src="fretboard.js"></script>
+  <script src="app.js"></script>
+  <script>createKeyboard('keyboard'); createFretboard('fretboard')</script>
+</body>
+</html>

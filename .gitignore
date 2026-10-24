@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# 本地配置与工具
+.env
+*.local
+.claude/
+.cursor/
+.idea/
+.vscode/
+
+# 构建产物
+build/
+dist/
+ModeCalc.spec
+*.log
+
+# 系统文件
+Thumbs.db
+.DS_Store
