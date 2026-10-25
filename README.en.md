@@ -33,14 +33,15 @@ Get the latest Windows build from [Releases](https://github.com/lewihuang/ModeCa
 
 - **Two lenses**: switch between `Chord` and `Mode` analysis for the same notes.
 - **Chord detection**: ~60 templates covering triads, seventh, ninth/eleventh/thirteenth, add and altered chords, with inversions and incomplete-match hints.
-- **Mode detection**: ~25 parent scales across diatonic modes, modes of limited transposition, pentatonic/blues, bebop and world scales; shows tonic, rotation and missing-note count.
+- **Mode detection**: 71 independent scales grouped into Natural Mode, Harmonic Major, Harmonic Minor, Melodic Minor, Jazz, Modes of limited transposition and World Music; shows tonic, rotation and missing-note count.
+- **Editable scale library**: every scale is an independent row grouped into collapsible categories; enable/disable any row. Default rows are read-only (renaming/editing creates a Custom copy); custom rows can be edited and deleted. The Info column shows absolute equivalents (e.g. C Ionian ≡ A Aeolian) and aliases; cross-category duplicates are kept as alias rows, disabled by default.
 - **Messiaen modes of limited transposition**: named by their minimal repeating interval cell (e.g. `Messiaen 211`, `Messiaen 1131`).
 - **Pinned mode**: click any match to pin it; notes outside the pinned scale are highlighted in red `#FF5768` on the keyboard.
 - **Derived modes**: while a mode is pinned, pressing multiple notes including out-of-scale notes lists modes anchored on the pinned tonic that contain all pressed notes; click one to re-pin.
 - **Visualisation**: standard notation (VexFlow), 88-key piano (SVG), guitar fretboard.
 - **Key signatures**: 15 keys, affecting enharmonic spelling and staff notation.
 - **MIDI**: device selection (including "All inputs") and sustain pedal support.
-- **Remembered selections**: parent-scale checkboxes are persisted locally and restored on startup.
+- **Remembered scale library**: enabled states, custom scales and edited copies are saved locally and restored on startup.
 
 ## Requirements
 
@@ -89,6 +90,7 @@ chord_engine.py      chord recognition (templates / inversions / incomplete matc
 mode_engine.py       scale registry and mode detection (parents, rotations, sub_scales)
 midi_handler.py      MIDI input (callback + queue, sustain pedal logic)
 settings_store.py    user settings persistence
+scale_library.py     editable scale library (defaults, overrides, custom scales)
 static/              frontend: HTML / CSS / JS, VexFlow, fonts, fretboard library
 tests/               pytest unit tests
 docs/                design docs, ADRs and changelog
@@ -103,6 +105,7 @@ build.bat            PyInstaller build script
 - **Red notes**: when a mode is pinned, pressed notes outside the scale turn red; this is only a hint and does not affect chord recognition.
 - **Derived modes**: red notes trigger candidate modes prefixed with `↳` and a red left border; click one to switch the pinned mode.
 - **Local settings**: saved in `%APPDATA%\ModeCalc\settings.json`; delete the file to reset.
+- **Scale settings**: open Settings from the right panel; scales are grouped into collapsible categories. Rename, edit notes on a one-octave keyboard, enable/disable, add/delete scales or restore defaults; group headers support tri-state select-all. Editing a default scale creates a custom copy and keeps the original (disabled); only the 7 Natural Mode modes are enabled by default.
 - **Browser debugging**: run `python server.py` and open `http://localhost:8765`.
 
 ## Contributing

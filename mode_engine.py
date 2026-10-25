@@ -363,6 +363,7 @@ def detect_modes(
     active_parents: set[str] | None = None,
     key_sig: str = "C",
     tonic_pc: int | None = None,
+    scales: list[dict] | None = None,
 ) -> list[dict]:
     """
     识别匹配的调式。
@@ -371,16 +372,20 @@ def detect_modes(
       1. 输入 pitch class ⊆ 调式 pitch class set
       2. 调中心 = tonic_pc；未指定时取 min(notes) % 12（最低音 = 调中心）
 
-    排序: missing ASC → category_priority ASC → scale_id ASC
+    排序: missing ASC → category_priority ASC → parent ASC
 
     参数:
       notes: MIDI note numbers (非空)
-      active_parents: 用户勾选的音阶 ID 集合，None = 全部启用
+      active_parents: 旧版母音阶过滤集合；scales 为 None 时生效
       key_sig: 调号，用于确定 #/b 命名
       tonic_pc: 强制指定调中心（0–11）；固定音阶后按同一调中心找新音阶时使用
+      scales: 用户音阶库的启用行；提供时优先于 active_parents
 
     返回: 匹配列表，每项含 name, tonic, tonic_pc, mode, rotation, parent, pcs
     """
+    if scales is not None:
+        return _detect_from_scales(notes, scales, key_sig, tonic_pc)
+
     if not notes:
         return []
 
@@ -441,6 +446,107 @@ def detect_modes(
         deduped.append(m)
 
     # 清理内部字段，保留 pcs
+    result = []
+    for m in deduped:
+        entry = {k: v for k, v in m.items() if not k.startswith("_")}
+        entry["pcs"] = sorted(m["_pcs"])
+        result.append(entry)
+
+    return result
+
+
+def _detect_from_scales(notes: set[int], scales: list[dict],
+                        key_sig: str = "C",
+                        tonic_pc: int | None = None) -> list[dict]:
+    """基于用户音阶库（enabled 行）的检测。"""
+    if not notes:
+        return []
+
+    input_pcs = {n % 12 for n in notes}
+    if tonic_pc is None:
+        tonic_pc = min(notes) % 12
+    tonic_pc %= 12
+    names = PITCH_NAMES if key_sig in _SHARP_KEYS else PITCH_NAMES_FLAT
+    tonic_name = names[tonic_pc]
+
+    raw = []
+    for scale in scales:
+        if not scale.get("enabled", True):
+            continue
+        pcs = sorted({int(p) % 12 for p in (scale.get("pcs") or [])})
+        if not pcs or 0 not in pcs:
+            continue
+
+        priority = scale.get("category_priority", 5)
+        parent = scale.get("parent_id") or scale.get("group_label") or scale.get("id") or ""
+        scale_id = scale.get("id") or ""
+        row_order = scale.get("order", 0)
+
+        if scale.get("kind") == "parent":
+            intervals = [pcs[i + 1] - pcs[i] for i in range(len(pcs) - 1)]
+            intervals.append(12 - pcs[-1])
+            mode_names = list(scale.get("mode_names") or [scale.get("name") or ""])
+            n_rot = min(len(mode_names), len(pcs))
+
+            for rotation in range(n_rot):
+                mode_pcs = build_mode_pcs(tonic_pc, intervals, rotation)
+                if not input_pcs.issubset(mode_pcs):
+                    continue
+
+                if rotation == 0:
+                    mode_name = scale.get("name") or mode_names[0]
+                elif rotation < len(mode_names):
+                    mode_name = mode_names[rotation]
+                else:
+                    mode_name = f"{scale.get('name') or ''} #{rotation + 1}"
+
+                label = scale.get("label") or scale.get("name") or ""
+                raw.append({
+                    "name": f"{tonic_name} {mode_name} ({label} #{rotation + 1})",
+                    "tonic": tonic_name,
+                    "tonic_pc": tonic_pc,
+                    "mode": mode_name,
+                    "rotation": rotation,
+                    "parent": parent,
+                    "scale_id": scale_id,
+                    "_missing": len(mode_pcs) - len(input_pcs),
+                    "_category_priority": priority,
+                    "_order": row_order,
+                    "_pcs": frozenset(mode_pcs),
+                })
+        else:
+            mode_pcs = {(tonic_pc + p) % 12 for p in pcs}
+            if not input_pcs.issubset(mode_pcs):
+                continue
+
+            mode_name = scale.get("name") or ""
+            rotation = int(scale.get("rotation") or 0)
+            raw.append({
+                "name": f"{tonic_name} {mode_name}",
+                "tonic": tonic_name,
+                "tonic_pc": tonic_pc,
+                "mode": mode_name,
+                "rotation": rotation,
+                "parent": parent,
+                "scale_id": scale_id,
+                "_missing": len(mode_pcs) - len(input_pcs),
+                "_category_priority": priority,
+                "_order": row_order,
+                "_pcs": frozenset(mode_pcs),
+            })
+
+    raw.sort(key=lambda m: (m["_missing"], m["_category_priority"],
+                            m["_order"]))
+
+    seen = set()
+    deduped = []
+    for m in raw:
+        key = (m["_pcs"], tonic_pc)
+        if key in seen:
+            continue
+        seen.add(key)
+        deduped.append(m)
+
     result = []
     for m in deduped:
         entry = {k: v for k, v in m.items() if not k.startswith("_")}

@@ -182,6 +182,7 @@ def analyze(
     key_sig: str = "C",
     pinned_pcs: set[int] | frozenset[int] | None = None,
     pinned_tonic: int | None = None,
+    scales: list[dict] | None = None,
 ) -> dict:
     """双透镜入口：和弦识别 + 调式检测。
 
@@ -189,6 +190,7 @@ def analyze(
     analysis_mode='mode' 且有音符时，额外填充 mode_matches。
     固定音阶（pinned_pcs / pinned_tonic）后，若按下音含音阶外音，
     再以该调中心为锚点找包含全部按下音的调式，填入 derived_matches。
+    scales 为 None 时沿用内置父音阶库（兼容旧调用）。
     """
     chord_result = recognize(notes, key_sig)
     result = {
@@ -201,9 +203,11 @@ def analyze(
     }
 
     if analysis_mode == "mode" and notes:
-        result["mode_matches"] = detect_modes(notes, active_parents, key_sig)
+        result["mode_matches"] = detect_modes(
+            notes, active_parents, key_sig, scales=scales
+        )
         result["derived_matches"] = _derived_matches(
-            notes, active_parents, key_sig, pinned_pcs, pinned_tonic
+            notes, active_parents, key_sig, pinned_pcs, pinned_tonic, scales
         )
 
     return result
@@ -215,6 +219,7 @@ def _derived_matches(
     key_sig: str,
     pinned_pcs: set[int] | frozenset[int] | None,
     pinned_tonic: int | None,
+    scales: list[dict] | None = None,
 ) -> list[dict]:
     """红音触发：以固定音阶的调中心为锚，找包含全部按下音的调式。
 
@@ -228,7 +233,9 @@ def _derived_matches(
     pinned = frozenset(pinned_pcs or ())
     if not any(pc not in pinned for pc in input_pcs):
         return []
-    derived = detect_modes(notes, active_parents, key_sig, tonic_pc=pinned_tonic)
+    derived = detect_modes(
+        notes, active_parents, key_sig, tonic_pc=pinned_tonic, scales=scales
+    )
     return [m for m in derived if frozenset(m["pcs"]) != pinned]
 
 

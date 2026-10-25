@@ -8,7 +8,7 @@ import json
 import os
 from pathlib import Path
 
-SETTINGS_VERSION = 1
+SETTINGS_VERSION = 2
 
 
 def default_settings_path() -> Path:
@@ -58,4 +58,18 @@ def save_parents(parents, path: str | os.PathLike | None = None) -> bool:
     data = load_settings(path)
     data["version"] = SETTINGS_VERSION
     data["parents"] = list(parents)
+    return save_settings(data, path)
+
+
+def load_scale_library(path: str | os.PathLike | None = None) -> dict:
+    """读取用户音阶库状态；无记录或格式非法时返回空 dict。"""
+    value = load_settings(path).get("scale_library")
+    return value if isinstance(value, dict) else {}
+
+
+def save_scale_library(state: dict, path: str | os.PathLike | None = None) -> bool:
+    """保存音阶库状态，保留文件中的其他字段。"""
+    data = load_settings(path)
+    data["version"] = SETTINGS_VERSION
+    data["scale_library"] = state
     return save_settings(data, path)

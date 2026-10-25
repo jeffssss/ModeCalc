@@ -8,7 +8,7 @@
 </head>
 <body>
   <div id="branding">
-    <div>ModeCalc v1.0.1</div>
+    <div>ModeCalc v1.2.0</div>
   </div>
   <nav id="menu-bar">
     <div class="menu-item">
@@ -73,82 +73,9 @@
         <label><input type="radio" name="analysis" value="chord" checked> Chord</label>
         <label><input type="radio" name="analysis" value="mode"> Mode</label>
       </div>
+      <button id="open-settings" class="settings-btn hidden">⚙ 音阶设置</button>
       <div id="mode-panel" class="hidden">
-        <div id="parent-checks">
-          <div class="scale-group">
-            <div class="group-header">
-              <input type="checkbox" class="group-check">
-              <span class="group-label">七声调式</span>
-              <span class="group-toggle">▼</span>
-            </div>
-            <div class="group-body collapsed">
-              <label><input type="checkbox" class="scale-check" value="Ionian" checked> Ionian</label>
-              <label><input type="checkbox" class="scale-check" value="Melodic Minor" checked> Melodic Minor</label>
-              <label><input type="checkbox" class="scale-check" value="Harmonic Minor" checked> Harmonic Minor</label>
-              <label><input type="checkbox" class="scale-check" value="Harmonic Major" checked> Harmonic Major</label>
-              <label><input type="checkbox" class="scale-check" value="Double Harmonic Major" checked> Double Harmonic Major</label>
-              <label><input type="checkbox" class="scale-check" value="Neapolitan Major" checked> Neapolitan Major</label>
-              <label><input type="checkbox" class="scale-check" value="Neapolitan Minor" checked> Neapolitan Minor</label>
-              <label><input type="checkbox" class="scale-check" value="Hungarian Minor" checked> Hungarian Minor</label>
-              <label><input type="checkbox" class="scale-check" value="Hungarian Major" checked> Hungarian Major</label>
-              <label><input type="checkbox" class="scale-check" value="Enigmatic" checked> Enigmatic</label>
-            </div>
-          </div>
-          <div class="scale-group">
-            <div class="group-header">
-              <input type="checkbox" class="group-check">
-              <span class="group-label">有限移位调式</span>
-              <span class="group-toggle">▼</span>
-            </div>
-            <div class="group-body collapsed">
-              <label><input type="checkbox" class="scale-check" value="Whole Tone"> Whole Tone</label>
-              <label><input type="checkbox" class="scale-check" value="Diminished WH"> Diminished Whole-Half</label>
-              <label><input type="checkbox" class="scale-check" value="Diminished HW"> Diminished Half-Whole</label>
-              <label><input type="checkbox" class="scale-check" value="Augmented"> Augmented</label>
-              <label><input type="checkbox" class="scale-check" value="Messiaen"> Messiaen</label>
-            </div>
-          </div>
-          <div class="scale-group">
-            <div class="group-header">
-              <input type="checkbox" class="group-check">
-              <span class="group-label">五声调式</span>
-              <span class="group-toggle">▼</span>
-            </div>
-            <div class="group-body collapsed">
-              <label><input type="checkbox" class="scale-check" value="Major Pentatonic"> Major Pentatonic</label>
-              <label><input type="checkbox" class="scale-check" value="Blues"> Blues</label>
-              <label><input type="checkbox" class="scale-check" value="Major Blues"> Major Blues</label>
-            </div>
-          </div>
-          <div class="scale-group">
-            <div class="group-header">
-              <input type="checkbox" class="group-check">
-              <span class="group-label">Bebop</span>
-              <span class="group-toggle">▼</span>
-            </div>
-            <div class="group-body collapsed">
-              <label><input type="checkbox" class="scale-check" value="Bebop Dominant"> Bebop Dominant</label>
-              <label><input type="checkbox" class="scale-check" value="Bebop Major"> Bebop Major</label>
-              <label><input type="checkbox" class="scale-check" value="Bebop Dorian"> Bebop Dorian</label>
-            </div>
-          </div>
-          <div class="scale-group">
-            <div class="group-header">
-              <input type="checkbox" class="group-check">
-              <span class="group-label">世界民族调式</span>
-              <span class="group-toggle">▼</span>
-            </div>
-            <div class="group-body collapsed">
-              <label><input type="checkbox" class="scale-check" value="Japanese"> Japanese</label>
-              <label><input type="checkbox" class="scale-check" value="Indian"> Indian</label>
-              <label><input type="checkbox" class="scale-check" value="Arabic"> Arabic</label>
-              <label><input type="checkbox" class="scale-check" value="Persian"> Persian</label>
-              <label><input type="checkbox" class="scale-check" value="Ethiopian"> Ethiopian</label>
-              <label><input type="checkbox" class="scale-check" value="Jewish"> Jewish</label>
-              <label><input type="checkbox" class="scale-check" value="Spanish"> Spanish</label>
-            </div>
-          </div>
-        </div>
+        <div id="scale-sidebar"></div>
       </div>
     </div>
   </div>
@@ -161,6 +88,28 @@
   <div id="fretboard"></div>
   <div id="keyboard"></div>
   <div id="debug-bar"><span id="db-midi">MIDI: ?</span> <span id="db-font">Font: ?</span> <span id="db-notes">Notes: -</span> <span id="db-sus"></span></div>
+  <div id="settings-view" class="hidden">
+    <div class="settings-shell">
+      <div class="settings-top">
+        <div class="settings-title">音阶设置</div>
+        <input id="scale-search" class="settings-search" placeholder="搜索音阶…">
+        <button id="scale-add" class="settings-action">添加音阶</button>
+        <button id="scale-reset" class="settings-action">恢复默认</button>
+        <button id="settings-close" class="settings-action primary">关闭</button>
+      </div>
+      <div class="settings-table">
+        <div class="settings-head">
+          <span>使用</span><span>名称</span><span>音阶</span><span>信息</span><span>删除</span>
+        </div>
+        <div id="settings-rows"></div>
+      </div>
+      <div class="settings-foot">
+        <span id="settings-count"></span>
+        <span id="settings-error"></span>
+        <span id="settings-notice"></span>
+      </div>
+    </div>
+  </div>
   <div id="modal-overlay" class="hidden">
     <div id="modal-box">
       <div id="modal-header">
@@ -178,8 +127,13 @@
         <p>实时和弦识别：基于约 60 个和弦模板，检测三和弦、七和弦、延伸音与转位。不完整匹配标记为"?"。点击 Matches 面板中的结果可将该调式的音阶高亮锁定在钢琴键盘上。</p>
 
         <h3>调式分析模式（Mode）</h3>
-        <p>调式/音阶检测，覆盖约 25 个父音阶，分类包括：七声调式、有限移位调式、五声调式、布鲁斯、Bebop、世界民族调式。</p>
-        <p>母音阶勾选状态会自动保存，下次启动自动恢复。</p>
+        <p>调式/音阶检测，覆盖 71 个独立音阶，分为 Natural Mode、Harmonic Major、Harmonic Minor、Melodic Minor、Jazz、Modes of limited transposition、World Music 等分类。</p>
+        <p>左侧列表显示当前启用的音阶；固定调式的红音与派生调式逻辑同上。音阶设置按钮只在 Mode 模式下显示。</p>
+
+        <h3>音阶设置（齿轮按钮）</h3>
+        <p>每个音阶都是独立行，可按分类/分组折叠。表格包含：使用、名称、音阶、信息、删除。信息列显示绝对等价示例（如 C Ionian ≡ A Aeolian）与别名。</p>
+        <p>音阶列是一个八度的迷你键盘，点击音符即可点亮/取消；根音 C 固定不可取消。分组头可三态全选。默认音阶不可删除或直接修改：改名称/音集会新建一条 Custom 音阶，原默认行保留并关闭。</p>
+        <p>Custom 分类与 World Music 同级，始终显示；支持添加自定义音阶、修改名称与音集、删除、恢复默认。所有改动即时保存，关闭设置后立即生效。</p>
 
         <h3>Matches 面板</h3>
         <p>显示所有符合当前音符输入的调式。点击某个结果可在钢琴键盘上锁定该调式音阶并高亮，再次点击取消锁定。</p>

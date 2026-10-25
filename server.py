@@ -11,6 +11,7 @@ from aiohttp import web
 
 from chord_engine import analyze, note_info
 from midi_handler import MidiHandler
+from scale_library import ScaleLibrary
 
 POLL_INTERVAL = 0.005  # 5ms MIDI 轮询
 SEND_INTERVAL = 0.03   # 30ms 推送间隔 (去重已交给前端 updateUI)
@@ -26,6 +27,7 @@ class State:
         self._active_parents: set[str] | None = None
         self._pinned_pcs: frozenset[int] = frozenset()
         self._pinned_tonic: int | None = None
+        self.library = ScaleLibrary.load()
 
     def set_analysis_mode(self, mode: str, parents: list[str] | None = None):
         if mode not in ("chord", "mode"):
@@ -62,9 +64,9 @@ class State:
         result = analyze(
             active,
             analysis_mode=self._analysis_mode,
-            active_parents=self._active_parents,
             pinned_pcs=self._pinned_pcs,
             pinned_tonic=self._pinned_tonic,
+            scales=self.library.detection_rows(),
         )
         result["active_notes"] = [note_info(n) for n in sorted(active)]
         result["sustain"] = self.handler.sustain
