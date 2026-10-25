@@ -66,6 +66,16 @@ def test_detection_with_default_library():
     assert "C Dorian" in names
 
 
+def test_same_pcs_aliases_both_shown(tmp_path):
+    library = ScaleLibrary(path=tmp_path / "settings.json")
+    library.set_group_enabled("world", "Chinese", True)
+    names = [m["name"] for m in detect_modes(
+        {60, 62, 64, 65, 67, 69, 71}, scales=library.detection_rows()
+    )]
+    assert "C Ionian" in names
+    assert "C Qingyue" in names
+
+
 def test_set_group_enabled(tmp_path):
     library = ScaleLibrary(path=tmp_path / "settings.json")
     result = library.set_group_enabled("world", "Chinese", True)

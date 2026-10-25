@@ -538,17 +538,8 @@ def _detect_from_scales(notes: set[int], scales: list[dict],
     raw.sort(key=lambda m: (m["_missing"], m["_category_priority"],
                             m["_order"]))
 
-    seen = set()
-    deduped = []
-    for m in raw:
-        key = (m["_pcs"], tonic_pc)
-        if key in seen:
-            continue
-        seen.add(key)
-        deduped.append(m)
-
     result = []
-    for m in deduped:
+    for m in raw:
         entry = {k: v for k, v in m.items() if not k.startswith("_")}
         entry["pcs"] = sorted(m["_pcs"])
         result.append(entry)
